@@ -1,28 +1,29 @@
 # fichier : app.py
 import streamlit as st
 
-# Stockage des tâches en mémoire (disparaît si on relance l'app)
-if "tasks" not in st.session_state:
-    st.session_state["tasks"] = []
+VALID_USERNAME = "admin"
+VALID_PASSWORD = "admin123"
 
-st.title("Ma TodoList")
 
-# Ajouter une nouvelle tâche
-new_task = st.text_input("Ajouter une tâche")
-if st.button("Ajouter"):
-    if new_task.strip() != "":
-        st.session_state["tasks"].append({"task": new_task, "done": False})
-        st.rerun()  # Rafraîchir pour afficher la nouvelle tâche
+def go_to_todolist() -> None:
+    st.switch_page("pages/todolist.py")
 
-# Afficher les tâches
-st.subheader("Liste des tâches")
-for i, t in enumerate(st.session_state["tasks"]):
-    col1, col2 = st.columns([0.8, 0.2])
-    with col1:
-        st.write(("Terminé - " if t["done"] else "À faire - ") + t["task"])
-    with col2:
-        if st.button("Marquer comme fait", key=f"done_{i}"):
-            st.session_state["tasks"][i]["done"] = True
 
-            st.rerun()  # Rafraîchir pour mettre à jour l'affichage
-# Lancer l'application avec : streamlit run app.py
+if st.session_state.get("authenticated"):
+    go_to_todolist()
+
+st.title("Connexion")
+st.caption("Connecte-toi pour accéder à la todolist.")
+
+with st.form("login_form"):
+    username = st.text_input("Nom d'utilisateur")
+    password = st.text_input("Mot de passe", type="password")
+    submitted = st.form_submit_button("Se connecter")
+
+if submitted:
+    if username == VALID_USERNAME and password == VALID_PASSWORD:
+        st.session_state["authenticated"] = True
+        st.session_state["username"] = username
+        go_to_todolist()
+    else:
+        st.error("Nom d'utilisateur ou mot de passe incorrect.")
