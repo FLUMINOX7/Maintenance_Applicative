@@ -1,7 +1,3 @@
-
-
-class DbWrapper():
-    pass
 from contextlib import contextmanager
 
 import psycopg_pool
